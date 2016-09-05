@@ -12,8 +12,7 @@ defmodule Ueberauth.Strategy.EDM.OAuth do
   import Logger
 
   @defaults [
-     strategy: __MODULE__,
-     discovery_url: "http://localhost:5000/.well-known/openid-configuration"
+     strategy: __MODULE__
    ]
 
   @doc """
@@ -30,27 +29,34 @@ defmodule Ueberauth.Strategy.EDM.OAuth do
       @defaults
       |> Keyword.merge(config)
       |> Keyword.merge(opts)
-    opts = opts |> Keyword.merge(load_discovery_url(opts))
-    opts = opts |> Keyword.merge([authorize_url: Keyword.get(opts, :authorization_endpoint)])
-                |> Keyword.merge([token_url: Keyword.get(opts, :token_endpoint)])
-    Logger.debug inspect(opts)
+    opts = case load_discovery_url(Keyword.get(opts, :discovery_url)) do
+      nil ->
+        opts
+      discovery_opts ->
+        opts |> Keyword.merge([authorize_url: Keyword.get(discovery_opts, :authorization_endpoint)])
+             |> Keyword.merge([token_url: Keyword.get(discovery_opts, :token_endpoint)])
+    end
+
     OAuth2.Client.new(opts)
   end
 
-  defp load_discovery_url(opts) do
-    case Keyword.get(opts, :discovery_url) do
-      nil ->
-        Logger.warn "No discovery URL specified"
-        []
-      url ->
-        case HTTPoison.get(url) do
-          {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-            body |> Poison.decode!
-                 |> Enum.map(fn({key, value}) -> {String.to_atom(key), value} end)
-          {_, %HTTPoison.Response{status_code: code, body: body}} ->
-            Logger.warn "Could not fetch discovery url: Status code #{code}, content: #{body}"
-            []
-        end
+  def load_discovery_url() do
+    config = Application.get_env(:ueberauth, Ueberauth.Strategy.EDM.OAuth)
+    load_discovery_url(Keyword.get(config, :discovery_url))
+  end
+
+  defp load_discovery_url(url) when is_nil(url) do
+    nil
+  end
+
+  defp load_discovery_url(url) do
+    case HTTPoison.get(url) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        body |> Poison.decode!
+             |> Enum.map(fn({key, value}) -> {String.to_atom(key), value} end)
+      {_, %HTTPoison.Response{status_code: code, body: body}} ->
+        Logger.warn "Could not fetch discovery url: Status code #{code}, content: #{body}"
+        nil
     end
   end
 
