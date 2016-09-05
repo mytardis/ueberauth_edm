@@ -1,6 +1,6 @@
-defmodule Ueberauth.Strategy.Google do
+defmodule Ueberauth.Strategy.EDM do
   @moduledoc """
-  Google Strategy for Überauth.
+  EDM Strategy for Überauth.
   """
 
   use Ueberauth.Strategy, uid_field: :sub, default_scope: "email", hd: nil
@@ -10,7 +10,7 @@ defmodule Ueberauth.Strategy.Google do
   alias Ueberauth.Auth.Extra
 
   @doc """
-  Handles initial request for Google authentication.
+  Handles initial request for EDM authentication.
   """
   def handle_request!(conn) do
     scopes = conn.params["scope"] || option(conn, :default_scope)
@@ -19,15 +19,15 @@ defmodule Ueberauth.Strategy.Google do
     opts = if option(conn, :hd), do: Keyword.put(opts, :hd, option(conn, :hd)), else: opts
     opts = Keyword.put(opts, :redirect_uri, callback_url(conn))
 
-    redirect!(conn, Ueberauth.Strategy.Google.OAuth.authorize_url!(opts))
+    redirect!(conn, Ueberauth.Strategy.EDM.OAuth.authorize_url!(opts))
   end
 
   @doc """
-  Handles the callback from Google.
+  Handles the callback from EDM.
   """
   def handle_callback!(%Plug.Conn{ params: %{ "code" => code } } = conn) do
     opts = [redirect_uri: callback_url(conn)]
-    token = Ueberauth.Strategy.Google.OAuth.get_token!([code: code], opts)
+    token = Ueberauth.Strategy.EDM.OAuth.get_token!([code: code], opts)
 
     if token.access_token == nil do
       set_errors!(conn, [error(token.other_params["error"], token.other_params["error_description"])])

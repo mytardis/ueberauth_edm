@@ -1,2 +1,0 @@
-defmodule UeberauthGoogle do
-end

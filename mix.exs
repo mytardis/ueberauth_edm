@@ -1,13 +1,13 @@
-defmodule UeberauthGoogle.Mixfile do
+defmodule UeberauthEDM.Mixfile do
   use Mix.Project
 
-  @version "0.3.0"
-  @url "https://github.com/ueberauth/ueberauth_google"
+  @version "0.0.1"
+  @url "https://github.com/mytardis/ueberauth_edm"
 
   def project do
-    [app: :ueberauth_google,
+    [app: :ueberauth_edm,
      version: @version,
-     name: "Ueberauth Google Strategy",
+     name: "Ueberauth EDM Strategy",
      package: package,
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
@@ -20,12 +20,14 @@ defmodule UeberauthGoogle.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :oauth2, :ueberauth]]
+    [applications: [:logger, :oauth2, :ueberauth, :poison, :httpoison]]
   end
 
   defp deps do
     [{:ueberauth, "~> 0.2"},
      {:oauth2, "0.6.0"},
+     {:httpoison, "~> 0.9.0"},
+     {:poison, "~> 2.0"},
      {:ex_doc, "~> 0.1", only: :dev},
      {:earmark, ">= 0.0.0", only: :dev}]
   end
@@ -35,12 +37,12 @@ defmodule UeberauthGoogle.Mixfile do
   end
 
   defp description do
-    "An Uberauth strategy for Google authentication."
+    "An Uberauth strategy for EDM authentication."
   end
 
   defp package do
     [files: ["lib", "mix.exs", "README.md", "LICENSE"],
-     maintainers: ["Sean Callan"],
+     maintainers: ["Jason Rigby"],
      licenses: ["MIT"],
      links: %{"GitHub": @url}]
   end
