@@ -1,16 +1,16 @@
-# Überauth Google
+# Überauth EDM
 
-> Google OAuth2 strategy for Überauth.
+> EDM OpenID Connect OAuth2 strategy for Überauth.
 
 ## Installation
 
-1. Setup your application at [Google Developer Console](https://console.developers.google.com/home).
+1. Setup the OpenID Connect auth server
 
-1. Add `:ueberauth_google` to your list of dependencies in `mix.exs`:
+1. Add `:ueberauth_edm` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:ueberauth_google, "~> 0.3"}]
+      [{:ueberauth_edm, git: "https://github.com/mytardis/ueberauth_edm.git"}]
     end
     ```
 
@@ -18,25 +18,26 @@
 
     ```elixir
     def application do
-      [applications: [:ueberauth_google]]
+      [applications: [:ueberauth_edm]]
     end
     ```
 
-1. Add Google to your Überauth configuration:
+1. Add EDM to your Überauth configuration:
 
     ```elixir
     config :ueberauth, Ueberauth,
       providers: [
-        google: {Ueberauth.Strategy.Google, []}
+        edm: {Ueberauth.Strategy.EDM, []}
       ]
     ```
 
 1.  Update your provider configuration:
 
     ```elixir
-    config :ueberauth, Ueberauth.Strategy.Google.OAuth,
-      client_id: System.get_env("GOOGLE_CLIENT_ID"),
-      client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+    config :ueberauth, Ueberauth.Strategy.EDM.OAuth,
+      client_id: System.get_env("EDM_CLIENT_ID"),
+      client_secret: System.get_env("EDM_CLIENT_SECRET")
+      discovery_url: System.get_env("EDM_DISCOVERY_URL")
     ```
 
 1.  Include the Überauth plug in your controller:
@@ -68,31 +69,7 @@ For an example implementation see the [Überauth Example](https://github.com/ueb
 
 Depending on the configured url you can initial the request through:
 
-    /auth/google
-
-Or with options:
-
-    /auth/google?scope=email%20profile
-
-By default the requested scope is "email". Scope can be configured either explicitly as a `scope` query value on the request path or in your configuration:
-
-```elixir
-config :ueberauth, Ueberauth,
-  providers: [
-    google: {Ueberauth.Strategy.Google, [default_scope: "emails profile plus.me"]}
-  ]
-```
-
-You can also pass the `hd` parameter to limit sign-in to a particular Google Apps hosted domain.
-
-```elixir
-config :ueberauth, Ueberauth,
-  providers: [
-    google: {Ueberauth.Strategy.Google, [hd: "example.com"]}
-  ]
-```
-
-To guard against client-side request modification, it's important to still check the domain in `info.urls[:website]` within the `Ueberauth.Auth` struct if you want to limit sign-in to a specific domain.
+    /auth/edm
 
 ## License
 
