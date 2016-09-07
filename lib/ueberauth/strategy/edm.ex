@@ -3,7 +3,7 @@ defmodule Ueberauth.Strategy.EDM do
   EDM Strategy for Überauth.
   """
 
-  use Ueberauth.Strategy, uid_field: :sub, default_scope: "openid profile", hd: nil
+  use Ueberauth.Strategy, uid_field: :sub, default_scope: "openid profile email", hd: nil
 
   alias Ueberauth.Auth.Info
   alias Ueberauth.Auth.Credentials
