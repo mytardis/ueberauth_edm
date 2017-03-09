@@ -72,6 +72,7 @@ defmodule Ueberauth.Strategy.EDM.OAuth do
   def get_token!(params \\ [], opts \\ []) do
     opts
     |> client
+    |> put_param(:client_secret, client.client_secret)
     |> OAuth2.Client.get_token!(params)
   end
 

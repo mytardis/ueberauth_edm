@@ -15,6 +15,7 @@ defmodule Ueberauth.Strategy.EDM do
   Handles initial request for EDM authentication.
   """
   def handle_request!(conn) do
+
     scopes = conn.params["scope"] || option(conn, :default_scope)
     Logger.debug "These are the requested scopes: " <> scopes
     opts = [ scope: scopes ]
@@ -29,19 +30,22 @@ defmodule Ueberauth.Strategy.EDM do
   Handles the callback from EDM auth.
   """
   def handle_callback!(%Plug.Conn{ params: %{ "code" => code } } = conn) do
+
     opts = [redirect_uri: callback_url(conn)]
-    token = Ueberauth.Strategy.EDM.OAuth.get_token!([code: code], opts)
+    client = Ueberauth.Strategy.EDM.OAuth.get_token!([code: code], opts)
     Logger.debug "This is the token:"
-    Logger.debug inspect(token)
+    Logger.debug inspect(client)
+    token = client.token
     if token.access_token == nil do
       set_errors!(conn, [error(token.other_params["error"], token.other_params["error_description"])])
     else
-      fetch_user(conn, token)
+      fetch_user(conn, client)
     end
   end
 
   @doc false
   def handle_callback!(conn) do
+
     set_errors!(conn, [error("missing_code", "No code received")])
   end
 
@@ -113,12 +117,13 @@ defmodule Ueberauth.Strategy.EDM do
   end
 
 
-  defp fetch_user(conn, token) do
+  defp fetch_user(conn, client) do
+    token = client.token
     conn = put_private(conn, :edm_token, token)
 
     path = Ueberauth.Strategy.EDM.OAuth.load_discovery_url()
             |> Keyword.get(:userinfo_endpoint)
-    resp = OAuth2.AccessToken.get(token, path)
+    resp = OAuth2.Client.get(client, path)
     Logger.debug "This is the data from the user info endpoint:"
     Logger.debug inspect(resp)
     case resp do
