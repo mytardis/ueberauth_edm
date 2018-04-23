@@ -26,8 +26,8 @@ defmodule UeberauthEDM.Mixfile do
   defp deps do
     [{:ueberauth, "~> 0.2"},
      {:oauth2, "~> 0.9.0"},
-     {:httpoison, "~> 0.9.0"},
-     {:poison, "~> 2.0"},
+     {:httpoison, "~> 0.13.0"},
+     {:poison, "~> 3.0"},
      {:ex_doc, "~> 0.1", only: :dev},
      {:earmark, ">= 0.0.0", only: :dev}]
   end
