@@ -74,7 +74,6 @@ defmodule Ueberauth.Strategy.EDM do
   def credentials(conn) do
     token = conn.private.edm_token
     scopes = (token.other_params["scope"] || "")
-              |> String.split(",")
 
     %Credentials{
       expires: !!token.expires_at,
