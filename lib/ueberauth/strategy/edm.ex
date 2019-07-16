@@ -20,6 +20,10 @@ defmodule Ueberauth.Strategy.EDM do
     Logger.debug "These are the requested scopes: " <> scopes
     opts = [ scope: scopes ]
     opts = if conn.params["state"], do: Keyword.put(opts, :state, conn.params["state"]), else: opts
+    opts =
+      if conn.params["organization_domain"],
+        do: Keyword.put(opts, :organization_domain, conn.params["organization_domain"]),
+        else: opts
     opts = if option(conn, :hd), do: Keyword.put(opts, :hd, option(conn, :hd)), else: opts
     opts = Keyword.put(opts, :redirect_uri, callback_url(conn))
     Logger.debug "OAuth2 request URL: " <> Ueberauth.Strategy.EDM.OAuth.authorize_url!(opts)
