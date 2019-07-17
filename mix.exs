@@ -29,7 +29,8 @@ defmodule UeberauthEDM.Mixfile do
      {:httpoison, "~> 0.13.0"},
      {:poison, "~> 3.0"},
      {:ex_doc, "~> 0.1", only: :dev},
-     {:earmark, ">= 0.0.0", only: :dev}]
+     {:earmark, ">= 0.0.0", only: :dev},
+     {:mock, "~> 0.3.0", only: :test}]
   end
 
   defp docs do
