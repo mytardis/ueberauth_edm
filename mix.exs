@@ -5,18 +5,20 @@ defmodule UeberauthEDM.Mixfile do
   @url "https://github.com/mytardis/ueberauth_edm"
 
   def project do
-    [app: :ueberauth_edm,
-     version: @version,
-     name: "Ueberauth EDM Strategy",
-     package: package(),
-     elixir: "~> 1.1",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     source_url: @url,
-     homepage_url: @url,
-     description: description(),
-     deps: deps(),
-     docs: docs()]
+    [
+      app: :ueberauth_edm,
+      version: @version,
+      name: "Ueberauth EDM Strategy",
+      package: package(),
+      elixir: "~> 1.1",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      source_url: @url,
+      homepage_url: @url,
+      description: description(),
+      deps: deps(),
+      docs: docs()
+    ]
   end
 
   def application do
@@ -24,13 +26,15 @@ defmodule UeberauthEDM.Mixfile do
   end
 
   defp deps do
-    [{:ueberauth, "~> 0.2"},
-     {:oauth2, "~> 0.9.0"},
-     {:httpoison, "~> 0.13.0"},
-     {:poison, "~> 3.0"},
-     {:ex_doc, "~> 0.1", only: :dev},
-     {:earmark, ">= 0.0.0", only: :dev},
-     {:mock, "~> 0.3.0", only: :test}]
+    [
+      {:ueberauth, "~> 0.2"},
+      {:oauth2, "~> 0.9.0"},
+      {:httpoison, "~> 0.13.0"},
+      {:poison, "~> 4.0"},
+      {:ex_doc, "~> 0.1", only: :dev},
+      {:earmark, ">= 0.0.0", only: :dev},
+      {:mock, "~> 0.3.0", only: :test}
+    ]
   end
 
   defp docs do
@@ -42,9 +46,11 @@ defmodule UeberauthEDM.Mixfile do
   end
 
   defp package do
-    [files: ["lib", "mix.exs", "README.md", "LICENSE"],
-     maintainers: ["Jason Rigby"],
-     licenses: ["MIT"],
-     links: %{"GitHub": @url}]
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      maintainers: ["Jason Rigby"],
+      licenses: ["MIT"],
+      links: %{GitHub: @url}
+    ]
   end
 end
