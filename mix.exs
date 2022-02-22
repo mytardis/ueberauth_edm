@@ -30,7 +30,7 @@ defmodule UeberauthEDM.Mixfile do
       {:ueberauth, "~> 0.2"},
       {:oauth2, "~> 0.9.0"},
       {:httpoison, "~> 1.7"},
-      {:poison, "~> 4.0"},
+      {:poison, "~> 5.0"},
       {:ex_doc, "~> 0.1", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev},
       {:mock, "~> 0.3.0", only: :test}
