@@ -15,33 +15,38 @@ defmodule Ueberauth.Strategy.EDM do
   Handles initial request for EDM authentication.
   """
   def handle_request!(conn) do
-
     scopes = conn.params["scope"] || option(conn, :default_scope)
-    Logger.debug "These are the requested scopes: " <> scopes
-    opts = [ scope: scopes ]
-    opts = if conn.params["state"], do: Keyword.put(opts, :state, conn.params["state"]), else: opts
+    Logger.debug("These are the requested scopes: " <> scopes)
+    opts = [scope: scopes]
+
+    opts =
+      if conn.params["state"], do: Keyword.put(opts, :state, conn.params["state"]), else: opts
+
     opts =
       if conn.params["organization_domain"],
         do: Keyword.put(opts, :organization_domain, conn.params["organization_domain"]),
         else: opts
+
     opts = if option(conn, :hd), do: Keyword.put(opts, :hd, option(conn, :hd)), else: opts
     opts = Keyword.put(opts, :redirect_uri, callback_url(conn))
-    Logger.debug "OAuth2 request URL: " <> Ueberauth.Strategy.EDM.OAuth.authorize_url!(opts)
+    Logger.debug("OAuth2 request URL: " <> Ueberauth.Strategy.EDM.OAuth.authorize_url!(opts))
     redirect!(conn, Ueberauth.Strategy.EDM.OAuth.authorize_url!(opts))
   end
 
   @doc """
   Handles the callback from EDM auth.
   """
-  def handle_callback!(%Plug.Conn{ params: %{ "code" => code } } = conn) do
-
+  def handle_callback!(%Plug.Conn{params: %{"code" => code}} = conn) do
     opts = [redirect_uri: callback_url(conn)]
     client = Ueberauth.Strategy.EDM.OAuth.get_token!([code: code], opts)
-    Logger.debug "This is the token:"
-    Logger.debug inspect(client)
+    Logger.debug("This is the token:")
+    Logger.debug(inspect(client))
     token = client.token
+
     if token.access_token == nil do
-      set_errors!(conn, [error(token.other_params["error"], token.other_params["error_description"])])
+      set_errors!(conn, [
+        error(token.other_params["error"], token.other_params["error_description"])
+      ])
     else
       fetch_user(conn, client)
     end
@@ -49,7 +54,6 @@ defmodule Ueberauth.Strategy.EDM do
 
   @doc false
   def handle_callback!(conn) do
-
     set_errors!(conn, [error("missing_code", "No code received")])
   end
 
@@ -77,7 +81,7 @@ defmodule Ueberauth.Strategy.EDM do
   """
   def credentials(conn) do
     token = conn.private.edm_token
-    scopes = (token.other_params["scope"] || "")
+    scopes = token.other_params["scope"] || ""
 
     %Credentials{
       expires: !!token.expires_at,
@@ -119,22 +123,27 @@ defmodule Ueberauth.Strategy.EDM do
     }
   end
 
-
   defp fetch_user(conn, client) do
     token = client.token
     conn = put_private(conn, :edm_token, token)
 
-    path = Ueberauth.Strategy.EDM.OAuth.load_discovery_url()
-            |> Keyword.get(:userinfo_endpoint)
+    path =
+      Ueberauth.Strategy.EDM.OAuth.load_discovery_url()
+      |> Keyword.get(:userinfo_endpoint)
+
     resp = OAuth2.Client.get(client, path)
-    Logger.debug "This is the data from the user info endpoint:"
-    Logger.debug inspect(resp)
+    Logger.debug("This is the data from the user info endpoint:")
+    Logger.debug(inspect(resp))
+
     case resp do
-      { :ok, %OAuth2.Response{status_code: 401, body: _body}} ->
-        set_errors!(conn, [error("token", "unauthorized")])
-      { :ok, %OAuth2.Response{status_code: status_code, body: user} } when status_code in 200..399 ->
+      {:ok, %OAuth2.Response{status_code: status_code, body: user}}
+      when status_code in 200..399 ->
         put_private(conn, :edm_user, user)
-      { :error, %OAuth2.Error{reason: reason} } ->
+
+      {:error, %OAuth2.Response{status_code: 401, body: _body}} ->
+        set_errors!(conn, [error("token", "unauthorized")])
+
+      {:error, %OAuth2.Error{reason: reason}} ->
         set_errors!(conn, [error("OAuth2", reason)])
     end
   end
